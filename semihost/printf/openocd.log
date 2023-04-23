@@ -1,6 +1,0 @@
-Warn : deprecated option: -p/--pipe. Use '-c "gdb_port pipe; log_output openocd.log"' instead.
-Info : only one transport option; autoselect 'jtag'
-Info : Initializing remote_bitbang driver
-Info : Connecting to 127.0.0.1:9824
-Error: Failed to connect: Connection refused
-

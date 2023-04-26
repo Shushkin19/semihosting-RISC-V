@@ -4,9 +4,10 @@
 #define SEMIHOSTING_SYS_FILE_MODE_WPLUS 6
 #define SEMIHOSTING_SYS_FILE_MODE_RPUS  2
 int main(){
-    /*int file_handler_for_write;
+
+    int file_handler_for_write;
     
-    if( ( file_handler_for_write=sh_fopen("//home//ubuntu//code//risc-v//one//semihost//file//write.txt", SEMIHOSTING_SYS_FILE_MODE_WRITE) ) == -1 ) {
+    if( ( file_handler_for_write=sh_fopen("//home//ubuntu//code//risc-v//one//semihost//file//write.txt", SEMIHOSTING_SYS_FILE_MODE_WPLUS) ) == -1 ) {
     
     sh_print("Cannot open file.\n");
     
@@ -19,10 +20,10 @@ int main(){
     }
     sh_fclose(file_handler_for_write);
 
-*/
+
     int file_handler;
     
-    if( ( file_handler=sh_fopen("//home//ubuntu//code//risc-v//one//semihost//file//read.txt", 2) ) == -1 ) {
+    if( ( file_handler=sh_fopen("//home//ubuntu//code//risc-v//one//semihost//file//read.txt", SEMIHOSTING_SYS_FILE_MODE_RPUS) ) == -1 ) {
     
     sh_print("Cannot open file.\n");
     

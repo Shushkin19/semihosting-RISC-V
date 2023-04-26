@@ -24,6 +24,9 @@
 #define SEMIHOSTING_SYS_READ  0x06
 #define SEMIHOSTING_SYS_CLOSE 0x02
 #define SEMIHOSTING_SYS_FLEN  0x0C
+#define SEMIHOSTING_SYS_SEEK  0x0A
+
+
 
 void trap(uintptr_t mcause, uintptr_t mepc, uintptr_t mtval)
 {
@@ -120,7 +123,7 @@ int sh_fwrite(int file_handler, const char *str){
 
 }
 
-int sh_fread(int file_handler, const char* str, int len){
+int sh_fread(int file_handler,  char* str, int len){
 
     uintptr_t arg[1];
     arg[0] = (uintptr_t) file_handler;
@@ -138,4 +141,13 @@ int sh_flen(int file_handler)  {
     arg[0] = (uintptr_t) file_handler;
     return call_host(SEMIHOSTING_SYS_FLEN, (void*)arg);
 
+}
+
+
+int sh_fseek(int file_handler, int byte_offset){
+    
+    uintptr_t arg[2];
+    arg[0] = (uintptr_t) file_handler;
+    arg[1] = (uintptr_t) byte_offset;
+    return call_host(SEMIHOSTING_SYS_SEEK, (void*)arg);
 }

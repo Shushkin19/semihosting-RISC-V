@@ -1,1 +1,1 @@
-ultra good.
+Hello, semihosting!

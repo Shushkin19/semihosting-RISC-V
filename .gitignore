@@ -3,3 +3,6 @@
 /array
 /gdb-openocd
 /sum-number
+semihost/.vscode/c_cpp_properties.json
+.gitignore
+semihost/file/file_riscv

@@ -1,4 +1,4 @@
-TARGET = print_riscv
+TARGET = file_riscv
 SRC = $(wildcard *.c)
 
 

@@ -14,9 +14,16 @@
 #define SRAI_X0_X0_0X07_OPCODE  0x40705013
 
 #define RISCV_SEMIHOSTING_CALL_NUMBER 7
-#define SEMIHOSTING_SYS_WRITE 0x05
+
+//console io
 #define SEMIHOSTING_SYS_WRITE0 0x04
 
+//file
+#define SEMIHOSTING_SYS_WRITE 0x05
+#define SEMIHOSTING_SYS_OPEN  0x01
+#define SEMIHOSTING_SYS_READ  0x06
+#define SEMIHOSTING_SYS_CLOSE 0x02
+#define SEMIHOSTING_SYS_FLEN  0x0C
 
 void trap(uintptr_t mcause, uintptr_t mepc, uintptr_t mtval)
 {
@@ -46,6 +53,8 @@ void trap(uintptr_t mcause, uintptr_t mepc, uintptr_t mtval)
     while(1);
 }
 
+
+
 static inline int __attribute__ ((always_inline)) call_host(int reason, void* arg) {
  register uintptr_t r0 asm("a0") = reason;
     register uintptr_t r1 asm("a1") = arg;
@@ -66,8 +75,67 @@ static inline int __attribute__ ((always_inline)) call_host(int reason, void* ar
 }
 
 
+
+int my_strlen(const char* str){
+    int count = 0;
+    while(str[count]!='\0'){
+        count++;
+    }
+
+    return count;
+}
+
+
 void sh_print(char* str){
 
 call_host(SEMIHOSTING_SYS_WRITE0, (void*) str);
+
+}
+
+int sh_fopen(const char *fname, int mode){
+    uintptr_t arg[3];
+	arg[0] = (uintptr_t)fname;
+	arg[1] = (uintptr_t)mode;
+	arg[2] = (uintptr_t)my_strlen(fname);
+
+	int file_handle = call_host(SEMIHOSTING_SYS_OPEN, (void *)arg);
+	return file_handle;
+}
+
+int sh_fclose(int file_handler){
+
+    int result = call_host(SEMIHOSTING_SYS_CLOSE, file_handler);
+    
+    return result;
+}
+
+int sh_fwrite(int file_handler, const char *str){
+    //implemented only for char*
+    uintptr_t arg[3];
+    arg[0] = (uintptr_t) file_handler;
+    arg[1] = (uintptr_t) str;
+    arg[2] = (uintptr_t) my_strlen(str);
+    return call_host(SEMIHOSTING_SYS_WRITE, (void*)arg);
+
+
+}
+
+int sh_fread(int file_handler, const char* str, int len){
+
+    uintptr_t arg[1];
+    arg[0] = (uintptr_t) file_handler;
+    arg[1] = (uintptr_t) str;
+    arg[2] = (uintptr_t) len;
+    return call_host(SEMIHOSTING_SYS_READ, (void*)arg);
+
+
+}
+
+
+int sh_flen(int file_handler)  {
+
+    uintptr_t arg[1];
+    arg[0] = (uintptr_t) file_handler;
+    return call_host(SEMIHOSTING_SYS_FLEN, (void*)arg);
 
 }

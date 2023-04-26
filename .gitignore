@@ -4,5 +4,7 @@
 /gdb-openocd
 /sum-number
 semihost/.vscode/c_cpp_properties.json
+semihost/.vscode/settings.json
 .gitignore
 semihost/file/file_riscv
+

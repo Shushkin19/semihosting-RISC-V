@@ -20,23 +20,5 @@ int main(){
     sh_fclose(file_handler_for_write);
 
 
-    int file_handler;
-    
-    if( ( file_handler=sh_fopen("//home//ubuntu//code//risc-v//one//semihost//file//read.txt", 2) ) == -1 ) {
-    
-    sh_print("Cannot open file.\n");
-    
-    } 
-    else {
-        int len = sh_flen(file_handler);
-        uint8_t str[24];
-        int read_byte = sh_fread(file_handler,str,len+1);
-       sh_print(str);
-    }
-
-    sh_fclose(file_handler);
-
-
-
     return 0;
 }

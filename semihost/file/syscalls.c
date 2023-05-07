@@ -125,7 +125,7 @@ int sh_fwrite(int file_handler, const char *str){
 
 int sh_fread(int file_handler,  char* str, int len){
 
-    uintptr_t arg[1];
+    uintptr_t arg[3];
     arg[0] = (uintptr_t) file_handler;
     arg[1] = (uintptr_t) str;
     arg[2] = (uintptr_t) len;

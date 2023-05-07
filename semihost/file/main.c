@@ -32,7 +32,7 @@ int main(){
        int len = sh_flen(file_handler);
         char str[24];
         int state = sh_fseek(file_handler, 0);
-        int read_byte = sh_fread(file_handler,&str,len);
+        int read_byte = sh_fread(file_handler,str,len);
        sh_print(str);
     }
 

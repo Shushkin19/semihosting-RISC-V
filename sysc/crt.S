@@ -106,12 +106,14 @@ _start:
 1:
 #endif
 
+
+  #la t0, supervisor_trap_entry
+  #csrw stvec, t0
+
   # initialize trap vector
   la t0, machine_trap_entry
   csrw mtvec, t0
 
-  la t0, user_trap_entry
-  csrw utvec, t0
   # initialize global pointer
 .option push
 .option norelax
@@ -121,6 +123,8 @@ _start:
   la  tp, _end + 63
   and tp, tp, -64
 
+  #li, t0, 1
+  
   # get core id
   csrr a0, mhartid
   # for now, assume only 1 core
@@ -136,87 +140,6 @@ _start:
   add tp, tp, a2
 
   j main
-
-  .align 2
-user_trap_entry:
-  addi sp, sp, -272
-
-  SREG x1, 1*REGBYTES(sp)
-  SREG x2, 2*REGBYTES(sp)
-  SREG x3, 3*REGBYTES(sp)
-  SREG x4, 4*REGBYTES(sp)
-  SREG x5, 5*REGBYTES(sp)
-  SREG x6, 6*REGBYTES(sp)
-  SREG x7, 7*REGBYTES(sp)
-  SREG x8, 8*REGBYTES(sp)
-  SREG x9, 9*REGBYTES(sp)
-  SREG x10, 10*REGBYTES(sp)
-  SREG x11, 11*REGBYTES(sp)
-  SREG x12, 12*REGBYTES(sp)
-  SREG x13, 13*REGBYTES(sp)
-  SREG x14, 14*REGBYTES(sp)
-  SREG x15, 15*REGBYTES(sp)
-  SREG x16, 16*REGBYTES(sp)
-  SREG x17, 17*REGBYTES(sp)
-  SREG x18, 18*REGBYTES(sp)
-  SREG x19, 19*REGBYTES(sp)
-  SREG x20, 20*REGBYTES(sp)
-  SREG x21, 21*REGBYTES(sp)
-  SREG x22, 22*REGBYTES(sp)
-  SREG x23, 23*REGBYTES(sp)
-  SREG x24, 24*REGBYTES(sp)
-  SREG x25, 25*REGBYTES(sp)
-  SREG x26, 26*REGBYTES(sp)
-  SREG x27, 27*REGBYTES(sp)
-  SREG x28, 28*REGBYTES(sp)
-  SREG x29, 29*REGBYTES(sp)
-  SREG x30, 30*REGBYTES(sp)
-  SREG x31, 31*REGBYTES(sp)
-
-  csrr a0, scause
-  csrr a1, sepc
-  mv a2, sp
-  jal user_handle_trap
-  csrw sepc, a0
-
-  # Remain in M-mode after eret
-  li t0, SSTATUS_SPP
-  csrs sstatus, t0
-
-  LREG x1, 1*REGBYTES(sp)
-  LREG x2, 2*REGBYTES(sp)
-  LREG x3, 3*REGBYTES(sp)
-  LREG x4, 4*REGBYTES(sp)
-  LREG x5, 5*REGBYTES(sp)
-  LREG x6, 6*REGBYTES(sp)
-  LREG x7, 7*REGBYTES(sp)
-  LREG x8, 8*REGBYTES(sp)
-  LREG x9, 9*REGBYTES(sp)
-  LREG x10, 10*REGBYTES(sp)
-  LREG x11, 11*REGBYTES(sp)
-  LREG x12, 12*REGBYTES(sp)
-  LREG x13, 13*REGBYTES(sp)
-  LREG x14, 14*REGBYTES(sp)
-  LREG x15, 15*REGBYTES(sp)
-  LREG x16, 16*REGBYTES(sp)
-  LREG x17, 17*REGBYTES(sp)
-  LREG x18, 18*REGBYTES(sp)
-  LREG x19, 19*REGBYTES(sp)
-  LREG x20, 20*REGBYTES(sp)
-  LREG x21, 21*REGBYTES(sp)
-  LREG x22, 22*REGBYTES(sp)
-  LREG x23, 23*REGBYTES(sp)
-  LREG x24, 24*REGBYTES(sp)
-  LREG x25, 25*REGBYTES(sp)
-  LREG x26, 26*REGBYTES(sp)
-  LREG x27, 27*REGBYTES(sp)
-  LREG x28, 28*REGBYTES(sp)
-  LREG x29, 29*REGBYTES(sp)
-  LREG x30, 30*REGBYTES(sp)
-  LREG x31, 31*REGBYTES(sp)
-
-  addi sp, sp, 272
-  sret
 
 
  .align 2
@@ -235,6 +158,31 @@ machine_trap_entry:
   SREG x10, 10*REGBYTES(sp)
   SREG x11, 11*REGBYTES(sp)
   SREG x12, 12*REGBYTES(sp)
+/*
+  mv t1, a0
+  mv a0, t1
+
+  mv t1, a1
+  mv a1, t1
+
+  mv t1, a2
+  mv a2, t1
+
+  mv t1, a3
+  mv a3, t1
+
+  mv t1, a4
+  mv a4, t1
+
+  mv t1, a5
+  mv a5, t1
+
+  mv t1, a6
+  mv a6, t1
+
+  mv t1, a7
+  mv a7, t1
+*/
   SREG x13, 13*REGBYTES(sp)
   SREG x14, 14*REGBYTES(sp)
   SREG x15, 15*REGBYTES(sp)
@@ -255,11 +203,16 @@ machine_trap_entry:
   SREG x30, 30*REGBYTES(sp)
   SREG x31, 31*REGBYTES(sp)
 
+  mv t0, a0
+  mv t1, a1
+  mv t2, a2
+  mv t2, a3
   csrr a0, mcause
   csrr a1, mepc
   mv a2, sp
+  csrr a3, mtval
   jal machine_handle_trap
-  csrw mepc, a0
+  #csrw mepc, a0
 
   # Remain in M-mode after eret
   li t0, MSTATUS_MPP
@@ -271,10 +224,13 @@ machine_trap_entry:
   LREG x4, 4*REGBYTES(sp)
   LREG x5, 5*REGBYTES(sp)
   LREG x6, 6*REGBYTES(sp)
-  LREG x7, 7*REGBYTES(sp)
   LREG x8, 8*REGBYTES(sp)
   LREG x9, 9*REGBYTES(sp)
-  LREG x10, 10*REGBYTES(sp)
+
+  #mv t2, a0
+  #LREG x10, 10*REGBYTES(sp)
+  #mv a0, t2
+
   LREG x11, 11*REGBYTES(sp)
   LREG x12, 12*REGBYTES(sp)
   LREG x13, 13*REGBYTES(sp)
@@ -296,6 +252,8 @@ machine_trap_entry:
   LREG x29, 29*REGBYTES(sp)
   LREG x30, 30*REGBYTES(sp)
   LREG x31, 31*REGBYTES(sp)
+  
+  LREG x7, 7*REGBYTES(sp)
 
   addi sp, sp, 272
   mret
@@ -308,3 +266,4 @@ tohost: .dword 0
 .align 6
 .globl fromhost
 fromhost: .dword 0
+

@@ -112,4 +112,26 @@ int sh_fread(int file_handler, char *str, int len);
 
 int sh_flen(int file_handler);
 
-int sh_fseek(int file_handler, int byte_offset, int origin);
+int sh_fseek(int file_handler, long position);
+
+#include <sys/timespec.h>
+
+struct kernel_stat
+{
+    unsigned long long st_dev;
+    unsigned long long st_ino;
+    unsigned int st_mode;
+    unsigned int st_nlink;
+    unsigned int st_uid;
+    unsigned int st_gid;
+    unsigned long long st_rdev;
+    unsigned long long __pad1;
+    long long st_size;
+    int st_blksize;
+    int __pad2;
+    long long st_blocks;
+    struct timespec st_atim;
+    struct timespec st_mtim;
+    struct timespec st_ctim;
+    int __glibc_reserved[2];
+};

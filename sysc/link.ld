@@ -6,7 +6,7 @@ _HEAP_SIZE  = 0x4000;
 
 
 SECTIONS
-{
+{  
 
   . = 0x80000000;
   .text.init : { *(.text.init) }

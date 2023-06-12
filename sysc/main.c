@@ -5,9 +5,8 @@
 int main()
 {
 
-/*
     FILE *file;
-    if ((file = fopen("//home//ubuntu//code//risc-v//one//sysc//for_read.txt", "r")) == NULL)
+    if ((file = fopen("//home//shusha//Code//RISC-V//Learn//semihosting-RISC-V//sysc//for_read.txt", "r")) == NULL)
     {
         printf("Error with file r\n");
         return 0;
@@ -24,7 +23,7 @@ int main()
     printf("\n%s\n\n", data);
 
     FILE *wrt;
-    if ((wrt = fopen("//home//ubuntu//code//risc-v//one//sysc//for_write.txt", "w")) == NULL)
+    if ((wrt = fopen("//home//shusha//Code//RISC-V//Learn//semihosting-RISC-V//sysc//for_write.txt", "w")) == NULL)
     {
         printf("Error with file w\n");
         return 0;
@@ -49,9 +48,8 @@ int main()
 
     fclose(wrt);
 
-*/
     int a = 10;
-    printf("%d\n", a);
+    printf("%d\n ", a);
 
     return 0;
 }

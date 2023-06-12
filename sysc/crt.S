@@ -106,10 +106,6 @@ _start:
 1:
 #endif
 
-
-  #la t0, supervisor_trap_entry
-  #csrw stvec, t0
-
   # initialize trap vector
   la t0, machine_trap_entry
   csrw mtvec, t0
@@ -122,8 +118,6 @@ _start:
 
   la  tp, _end + 63
   and tp, tp, -64
-
-  #li, t0, 1
   
   # get core id
   csrr a0, mhartid
@@ -158,31 +152,6 @@ machine_trap_entry:
   SREG x10, 10*REGBYTES(sp)
   SREG x11, 11*REGBYTES(sp)
   SREG x12, 12*REGBYTES(sp)
-/*
-  mv t1, a0
-  mv a0, t1
-
-  mv t1, a1
-  mv a1, t1
-
-  mv t1, a2
-  mv a2, t1
-
-  mv t1, a3
-  mv a3, t1
-
-  mv t1, a4
-  mv a4, t1
-
-  mv t1, a5
-  mv a5, t1
-
-  mv t1, a6
-  mv a6, t1
-
-  mv t1, a7
-  mv a7, t1
-*/
   SREG x13, 13*REGBYTES(sp)
   SREG x14, 14*REGBYTES(sp)
   SREG x15, 15*REGBYTES(sp)
@@ -203,16 +172,11 @@ machine_trap_entry:
   SREG x30, 30*REGBYTES(sp)
   SREG x31, 31*REGBYTES(sp)
 
-  mv t0, a0
-  mv t1, a1
-  mv t2, a2
-  mv t2, a3
   csrr a0, mcause
   csrr a1, mepc
   mv a2, sp
   csrr a3, mtval
   jal machine_handle_trap
-  #csrw mepc, a0
 
   # Remain in M-mode after eret
   li t0, MSTATUS_MPP
@@ -224,13 +188,9 @@ machine_trap_entry:
   LREG x4, 4*REGBYTES(sp)
   LREG x5, 5*REGBYTES(sp)
   LREG x6, 6*REGBYTES(sp)
+  LREG x7, 7*REGBYTES(sp)
   LREG x8, 8*REGBYTES(sp)
   LREG x9, 9*REGBYTES(sp)
-
-  #mv t2, a0
-  #LREG x10, 10*REGBYTES(sp)
-  #mv a0, t2
-
   LREG x11, 11*REGBYTES(sp)
   LREG x12, 12*REGBYTES(sp)
   LREG x13, 13*REGBYTES(sp)
@@ -252,8 +212,6 @@ machine_trap_entry:
   LREG x29, 29*REGBYTES(sp)
   LREG x30, 30*REGBYTES(sp)
   LREG x31, 31*REGBYTES(sp)
-  
-  LREG x7, 7*REGBYTES(sp)
 
   addi sp, sp, 272
   mret

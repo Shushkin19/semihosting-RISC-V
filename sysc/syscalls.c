@@ -5,6 +5,8 @@
 #include <limits.h>
 #include <sys/signal.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/reent.h>
 #include "syscalls.h"
 #include "encoding.h"
 
@@ -28,6 +30,10 @@ void mepc_increase()
         "csrw mepc, t0\n");
 }
 
+extern char __heap_start[];
+extern char __heap_end[];
+static char *brk = &__heap_start[0];
+
 /* - brk устанавливает конец сегмента данных в значение, указанное в аргументе end_data_segment, когда это значение является приемлимым,
  система симулирует нехватку памяти и процесс не достигает своего максимально возможного размера сегмента данных
 - sbrk увеличивает пространство данных программы на increment байт. sbrk не является системным вызовом, он просто является обёрткой (wrapper),
@@ -38,11 +44,7 @@ void mepc_increase()
  В случае ошибки возвращается -1 is и значение errno устанавливается в ENOMEM.
 
 */
-extern char __heap_start[];
-extern char __heap_end[];
-static char *brk = &__heap_start[0];
-
-int _brk(void *addr)
+int _brk(void *addr) /*unused!*/
 {
     brk = addr;
     return 0;
@@ -68,14 +70,23 @@ void *_sbrk(ptrdiff_t incr)
     return old_brk;
 }
 
-int my_fstat(uintptr_t fd)
+int my_fstat(uintptr_t fd, struct kernel_stat *kst)
 {
-    if (fd != 1 && fd != 0)
+    if (fd == 1 || fd == 0)
     {
-        return EBADF;
+        return 0;
     }
 
-    return 0;
+    else if (fd > 1)
+    {
+        kst->st_uid = fd;
+        return 0;
+    }
+
+    else
+    {
+        return fd;
+    }
 }
 
 int my_write(uintptr_t fd, const char *ptr, uintptr_t len)
@@ -83,6 +94,20 @@ int my_write(uintptr_t fd, const char *ptr, uintptr_t len)
     return sh_fwrite(fd, ptr, len);
 }
 
+int my_fseek(uintptr_t fd, int byte_offset, int origin)
+{
+    if (origin == 2)
+    {
+        int size = sh_flen(fd);
+        sh_fseek(fd, size - 1);
+        return size;
+    }
+    else if (origin == 0)
+    {
+
+        return sh_fseek(fd, 0);
+    }
+}
 /*Когда старший бит регистра mcause равен 1, тип прерывания — прерывание. Код исключения в регистре mcause читается.
 Если код исключения равен 7, это прерывание по таймеру. В этом случае вызывается обработчик прерывания таймера.
 Если код исключения равен 3, это программное прерывание. В этом случае вызывается программный обработчик прерывания.
@@ -101,7 +126,7 @@ uintptr_t __attribute__((weak)) ecall_handle_trap(uintptr_t a7, uintptr_t a0, ui
     switch (a7)
     {
     case SYS_fstat:
-        return my_fstat(a0);
+        return my_fstat(a0, a1);
         break;
 
     case SYS_write:
@@ -117,7 +142,7 @@ uintptr_t __attribute__((weak)) ecall_handle_trap(uintptr_t a7, uintptr_t a0, ui
         break;
 
     case SYS_lseek:
-        return sh_fseek(a0, a1, a2);
+        return my_fseek(a0, a1, a2);
         break;
 
     case SYS_close:
@@ -134,37 +159,6 @@ uintptr_t __attribute__((weak)) ecall_handle_trap(uintptr_t a7, uintptr_t a0, ui
         break;
     }
 }
-
-/*
-
-uintptr_t __attribute__((weak)) supervisor_handle_trap(uintptr_t mcause, uintptr_t mepc,uintptr_t mtval)
-{
-    while(1);
-
-  if (mcause == EBREAK_MCAUSE && mtval == EBREAK_OPCODE)
-                {
-
-
-                    int aligned = ((mepc-4) & 0x0f) == 0;
-
-                    if (aligned
-                        && *(uint32_t *)mepc     == EBREAK_OPCODE
-                        && *(uint32_t *)(mepc-4) == SLLI_X0_X0_0X1F_OPCODE
-                        && *(uint32_t *)(mepc+4) == SRAI_X0_X0_0X07_OPCODE)
-                    {
-                    asm volatile(
-                        "csrr t0, cepc\n"       // cepc !!!!
-                        "addi t0, t0, 4\n"
-                    "csrw cepc, t0\n"
-                );
-                    return;
-                }
-
-                while(1);
-            }
-}
-
-*/
 
 uintptr_t __attribute__((weak)) machine_handle_trap(uintptr_t mcause, uintptr_t mepc, uintptr_t regs[32], uintptr_t mtval)
 {
@@ -224,7 +218,7 @@ uintptr_t __attribute__((weak)) machine_handle_trap(uintptr_t mcause, uintptr_t 
             ;
     default:
         return;
-        // sh_print("default\n");
+        sh_print("default\n");
         break;
     }
 }
@@ -313,13 +307,12 @@ int sh_flen(int file_handler)
     return call_host(SEMIHOSTING_SYS_FLEN, (void *)arg);
 }
 
-int sh_fseek(int file_handler, int byte_offset, int origin)
+int sh_fseek(int file_handler, long position)
 {
 
     uintptr_t arg[2];
     arg[0] = (uintptr_t)file_handler;
-    arg[1] = (uintptr_t)byte_offset;
-    arg[2] = (uintptr_t)origin;
+    arg[1] = (uintptr_t)position;
     return call_host(SEMIHOSTING_SYS_SEEK, (void *)arg);
 }
 

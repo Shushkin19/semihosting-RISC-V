@@ -5,48 +5,50 @@
 int main()
 {
 
-    FILE *file;
-    if ((file = fopen("//home//shusha//Code//RISC-V//Learn//semihosting-RISC-V//sysc//for_read.txt", "r")) == NULL)
-    {
-        printf("Error with file r\n");
-        return 0;
-    }
+    char data[100] = {0};
+    /*
+       FILE *file;
+      if ((file = fopen("//home//shusha//Code//RISC-V//Learn//semihosting-RISC-V//sysc//for_read.txt", "r")) == NULL)
+      {
+          printf("Error with file r\n");
+      }
+      else
+      {
 
-    char data[30];
+          fseek(file, 0, SEEK_END);
+          int size_file = ftell(file);
+          fseek(file, 0, SEEK_SET);
+          fgets(data, size_file, file);
 
-    fseek(file, 0, SEEK_END);
-    int size_file = ftell(file);
-    fgets(data, 29, file);
+          fclose(file);
+          printf("%s\n", data);
+     */
 
-    fclose(file);
-
-    printf("\n%s\n\n", data);
-
-    FILE *wrt;
+    FILE *wrt = NULL;
     if ((wrt = fopen("//home//shusha//Code//RISC-V//Learn//semihosting-RISC-V//sysc//for_write.txt", "w")) == NULL)
     {
         printf("Error with file w\n");
-        return 0;
     }
-
-    int i = 0;
-
-    while (data[i] != "\n")
+    else
     {
-        if (data[i] == " ")
+
+        int i = 0;
+        while (data[i] != "\n")
         {
-            fprintf(wrt, "%s", "\n");
+            if (data[i] == " ")
+            {
+                fprintf(wrt, "%s", "\n");
+            }
+            else
+            {
+                fprintf(wrt, "%c", data[i]);
+            }
+            i++;
         }
-        else
-        {
-            fprintf(wrt, "%c", data[i]);
-        }
-        i++;
+        fprintf(wrt, "%s", "\nThis is just an example :)");
     }
-
-    fprintf(file, "%s", "\nThis is just an example :)");
-
     fclose(wrt);
+    // }
 
     int a = 10;
     printf("%d\n ", a);

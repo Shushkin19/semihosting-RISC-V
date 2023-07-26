@@ -10,7 +10,7 @@
 #include <sys/fcntl.h>
 #include <unistd.h>
 #include "syscalls.h"
-#include "encoding.h"
+#include "../inc/encoding.h"
 
 #if __NEWLIB__ <= 2 && __NEWLIB_MINOR__ <= 5
 #define _sbrk sbrk

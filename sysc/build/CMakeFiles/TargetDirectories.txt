@@ -1,0 +1,3 @@
+/home/shusha/Code/RISC-V/Learn/semihosting-RISC-V/sysc/build/CMakeFiles/smhost.dir
+/home/shusha/Code/RISC-V/Learn/semihosting-RISC-V/sysc/build/CMakeFiles/edit_cache.dir
+/home/shusha/Code/RISC-V/Learn/semihosting-RISC-V/sysc/build/CMakeFiles/rebuild_cache.dir

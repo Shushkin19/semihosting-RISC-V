@@ -1,0 +1,1 @@
+riscv64-unknown-elf-gcc CMakeFiles/smhost.dir/src/main.c.o CMakeFiles/smhost.dir/src/syscalls.c.o -o smhost 
